@@ -12,9 +12,9 @@ def calc_centered_reward(distance_from_center, track_width):
     if distance_from_center <= marker_1:
         reward = 1.0
     elif distance_from_center <= marker_2:
-        reward = 0.9
-    elif distance_from_center <= marker_3:
         reward = 0.7
+    elif distance_from_center <= marker_3:
+        reward = 0.2
     else:
         reward = 1e-3  # likely crashed/ close to off track
 
@@ -23,8 +23,10 @@ def calc_centered_reward(distance_from_center, track_width):
 
 def calc_finished_reward(steps, progress):
     # Total num of steps we want the car to finish the lap, it will vary depends on the track length
-    TOTAL_NUM_STEPS1 = 600
-    TOTAL_NUM_STEPS2 = 450
+    TOTAL_NUM_STEPS1 = 700
+    TOTAL_NUM_STEPS2 = 600
+    TOTAL_NUM_STEPS3 = 500
+    TOTAL_NUM_STEPS4 = 400
     CHECK_STEP_SIZE = 10  # As it is 10FPS camera
 
     # Initialize the reward with typical value
@@ -34,7 +36,11 @@ def calc_finished_reward(steps, progress):
     if (steps % CHECK_STEP_SIZE) == 0 and progress > (steps / TOTAL_NUM_STEPS1) * 100:
         reward += 10.0
     elif (steps % CHECK_STEP_SIZE) == 0 and progress > (steps / TOTAL_NUM_STEPS2) * 100:
-        reward += 30.0
+        reward += 20
+    elif (steps % CHECK_STEP_SIZE) == 0 and progress > (steps / TOTAL_NUM_STEPS3) * 100:
+        reward += 30
+    elif (steps % CHECK_STEP_SIZE) == 0 and progress > (steps / TOTAL_NUM_STEPS4) * 100:
+        reward += 40.0
 
     return reward
 
