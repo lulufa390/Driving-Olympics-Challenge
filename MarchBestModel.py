@@ -230,7 +230,7 @@ def calc_on_track_reward_coe(all_wheels_on_track):
 
 def calc_steering_reward_coe(steering):
     # Steering penality threshold, change the number based on your action space setting
-    ABS_STEERING_THRESHOLD = 20
+    ABS_STEERING_THRESHOLD = 15
 
     # Penalize reward if the car is steering too much
     if steering > ABS_STEERING_THRESHOLD:
@@ -253,8 +253,6 @@ def reward_function(params):
     waypoints = params['waypoints']
     closest_waypoints = params['closest_waypoints']
     heading = params['heading']
-
-    print("waypoints: #############", waypoints)
 
     reward = 0.0
     reward += calc_centered_reward(distance_from_center, track_width)
