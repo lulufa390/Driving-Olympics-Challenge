@@ -154,6 +154,14 @@ WAY_POINTS = [
     (4.503267526626587, 0.18162955343723297)
     ]
 
+def find_waypoint_index(current_point):
+    eps = 1e-8
+    for i in range(len(WAY_POINTS)): 
+        point = WAY_POINTS[i]
+        if abs(current_point[0] - point[0]) < eps and abs(current_point[1] - point[1]) < eps:
+            return i
+    return -1
+
 def calc_centered_reward(distance_from_center, track_width):
     # Calculate 3 marks that are farther and father away from the center line
     marker_1 = 0.1 * track_width
@@ -172,6 +180,17 @@ def calc_centered_reward(distance_from_center, track_width):
         reward = 1e-3  # likely crashed/ close to off track
 
     return reward
+
+def calc_speed_reward(closest_waypoints, speed):
+    breakpoints = [0, 17, 30, 48, 85, 120, 160, 200, 240, len(WAY_POINTS)]
+    idx = find_waypoint_index(WAY_POINTS[closest_waypoints[1]])
+    for i in range(len(breakpoints)):
+        if idx >= breakpoints[i] and idx < breakpoints[i + 1]:
+            # i % 2 == 0 means should be high-speed
+            if bool(i % 2 == 0) != bool(speed > 2.5):
+                return 0.0
+            else:
+                return 5.0
 
 
 def calc_finished_reward(steps, progress):
@@ -253,10 +272,12 @@ def reward_function(params):
     waypoints = params['waypoints']
     closest_waypoints = params['closest_waypoints']
     heading = params['heading']
+    speed = params['speed']
 
     reward = 0.0
     reward += calc_centered_reward(distance_from_center, track_width)
     reward += calc_finished_reward(steps, progress)
+    reward += calc_speed_reward(closest_waypoints, speed)
 
     reward *= calc_direction_reward_coe(waypoints, closest_waypoints, heading)
     reward *= calc_on_track_reward_coe(all_wheels_on_track)
